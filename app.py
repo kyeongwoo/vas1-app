@@ -3,17 +3,24 @@ from datetime import date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
+import json
 
-# JSON 인증 파일 경로
-json_path = "service_account.json"
+# ✅ Streamlit Secrets에서 인증 정보 불러오기
+json_data = st.secrets["GOOGLE_SERVICE_ACCOUNT"]
+json_string = json.dumps(json_data)
 
-# 구글 시트 인증
+# ✅ 임시 JSON 파일 생성
+with open("service_account.json", "w") as f:
+    f.write(json_string)
+
+# ✅ 구글 시트 인증
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-credentials = ServiceAccountCredentials.from_json_keyfile_name(json_path, scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name("service_account.json", scope)
 gc = gspread.authorize(credentials)
 
-# 구글 시트 열기
+# ✅ 구글 시트 열기
 sheet = gc.open("VAS심리기록").sheet1
+
 
 # ✅ 모바일에 적합한 페이지 설정
 st.set_page_config(page_title="심리 상태 평가", layout="centered")
